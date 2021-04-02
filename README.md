@@ -2,6 +2,10 @@
 
 ### Chat em tempo real feito com VueJS e Socket.IO, atualmente respeitando a comunicação de mensagens privadas, futuramente adição de chats em grupos, criação de grupos, status (online, offline, ausente e ocupado), e imagem de perfil.
 
+### Prints e demonstração:
+
+[Clique aqui](https://imgur.com/a/N62IJew)
+
 ## Iniciar instalação
 ```
 npm install
