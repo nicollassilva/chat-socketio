@@ -173,12 +173,12 @@ body:before {
                 background-color: $backgroundMenu;
                 padding: 10px;
                 border-radius: 5px;
-                cursor: pointer;
 
-                &:hover,
+                &:not(.empty):hover,
                 &.active {
                     background-color: #686de0;
                     color: white;
+                    cursor: pointer;
                 }
 
                 &:not(:first-of-type) { margin-top: 10px; }
@@ -190,6 +190,7 @@ body:before {
         width: calc(100% - 400px);
         height: 100vh;
         margin: 0 0 0 15px;
+        padding: 0 10px;
         box-shadow: 0 0 3px 5px rgba(0, 0, 0, 0.1);
         float: left;
         background-color: $backgroundMenu;
@@ -214,80 +215,115 @@ body:before {
             margin-top: 10px;
             position: relative;
             float: left;
-            padding: 10px;
             overflow: hidden auto;
             display: flex;
             flex-direction: column;
+            background: url('/images/backgroundChat.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 10px;
+
+            @media (max-width: 1024px) { padding: 10px 10px; }
+            @media (max-width: 1280px) { padding: 10px 20px; }
+            @media (min-width: 1366px) { padding: 10px 30px; }
 
             &::-webkit-scrollbar { width: 8px; background-color: rgba(0, 0, 0, 0.1); }
             &::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.5); }
 
             .message {
                 width: 50%;
-                max-width: 50%;
                 margin: 0 5px;
                 position: relative;
                 height: auto;
-                padding: 8px 30px 8px 10px;
-                word-break: break-word;
-                background-color: #535c68;
                 margin-top: 10px;
-                font-size: 14px;
-                border-radius: 10px;
-                color: rgba(255, 255, 255, .7);
+                display: flex;
+                justify-content: flex-start;
 
-                &:not(.me) { border-top-left-radius: 0px; }
-                
-                &.me {
-                    background-color: #5e656e;
-                    margin-left: auto;
-                    border-top-right-radius: 0px;
-                }
+                .msg {
+                    width: auto;
+                    height: auto;
+                    padding: 0px;
+                    font-size: 14px;
+                    color: rgba(0, 0, 0, .7);
+                    box-shadow: 0 2px 0 rgba(0, 0, 0, .7);
+                    padding: 8px 50px 8px 10px;
+                    word-break: break-word;
+                    background-color: #f1f2f6;
+                    border-radius: 5px;
+                    position: relative;
 
-                .options {
-                    position: absolute;
-                    right: 10px;
-                    top: 10px;
-                    cursor: pointer;
-                    color: rgba(255, 255, 255, .7);
+                    &.me {
+                        background-color: #b9c3cf;
+                        border-top-right-radius: 0px;
 
-                    i { visibility: hidden; }
+                        .options {
+                            i { background-color: #b9c3cf; }
 
-                    .menu {
+                            .menu {
+                                left: initial;
+                                right: 10px;
+                            }
+                        }
+                    }
+
+                    &:not(.me) { border-top-left-radius: 0px; }
+                    
+                    &:hover {
+                        .options {
+                            i { visibility: visible; }
+                        }
+                    }
+
+                    .hours {
                         position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        width: 200px;
-                        height: auto;
-                        padding: 5px;
-                        background-color: $background;
-                        box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.1);
-                        border-radius: 5px;
-                        z-index: 2;
+                        right: 4px;
+                        bottom: 2px;
+                        font-size: 11px;
+                        color: rgba(0, 0, 0, 0.4);
+                    }
 
-                        li {
-                            width: 100%;
-                            float: left;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            font-size: 14px;
-                            height: 40px;
-                            color: rgba(255, 255, 255, .8);
+                    .options {
+                        position: absolute;
+                        right: 5px;
+                        top: 6px;
+                        cursor: pointer;
+                        color: rgba(0, 0, 0, .7);
+                        z-index: 4;
+    
+                        i { visibility: hidden; padding: 5px; background-color: #f1f2f6; }
+    
+                        .menu {
+                            position: absolute;
+                            top: 15px;
+                            left: 15px;
+                            width: 200px;
+                            height: auto;
+                            padding: 5px;
+                            background-color: $background;
+                            box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.1);
                             border-radius: 5px;
-
-                            &:hover {
-                                background-color: rgba(255, 255, 255, .05);
+                            z-index: 2;
+    
+                            li {
+                                width: 100%;
+                                float: left;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                font-size: 14px;
+                                height: 40px;
+                                color: rgba(255, 255, 255, .8);
+                                border-radius: 5px;
+    
+                                &:hover {
+                                    background-color: rgba(255, 255, 255, .05);
+                                }
                             }
                         }
                     }
                 }
-
-                &:hover {
-                    .options {
-                        i { visibility: visible; }
-                    }
-                }
+                
+                &.me { margin-left: auto; justify-content: flex-end; }
             }
         }
 
@@ -295,13 +331,13 @@ body:before {
             width: 100%;
             height: 80px;
             position: relative;
-            padding: 15px;
+            padding: 5px;
             float: left;
             margin-top: 10px;
 
             input {
                 width: 100%;
-                height: 50px;
+                height: 80px;
                 background-color: $background;
                 padding: 10px;
                 border: none;
@@ -349,9 +385,9 @@ body:before {
         width: 300px;
         min-height: 100px;
         overflow: hidden auto;
-        background-color: #636e72;
+        background-color: $background;
         border-radius: 10px;
-        padding: 10px;
+        padding: 20px;
 
         span.title {
             width: 100%;

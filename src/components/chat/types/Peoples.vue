@@ -7,7 +7,7 @@
             </div>
         </div>
         </transition-group>
-        <div class="people" v-else @click.stop>Only you are online for now</div>
+        <div class="people empty" v-else @click.stop>Somente você está online :(</div>
     </div>
 </template>
 <script>

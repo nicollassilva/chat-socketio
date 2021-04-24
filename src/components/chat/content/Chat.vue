@@ -2,24 +2,30 @@
     <div class="chat" v-if="visibility">
         <div class="topbar">{{ userChat.name }}</div>
         <div class="messages" v-if="Array.isArray(messages) && chatMessage.length > 0">
-            <div :class="['message', msg.me && 'me']" v-for="msg in chatMessage" :key="msg.id">
-                <span>{{ msg.message }}</span>
-                <div class="options" @click="toggleOptions(msg)">
-                    <i class="fas fa-chevron-down"></i>
-                    <transition name="fade">
-                        <div class="menu" v-if="menuOptions !== null && menuOptions === msg.id">
-                            <li v-if="msg.me">Dados da mensagem</li>
-                            <li>Responder</li>
-                            <li>Encaminhar mensagem</li>
-                            <li>Favoritar mensagem</li>
-                            <li @click="deleteMessage(msg)">Apagar mensagem</li>
+            <transition-group name="fade">
+                <div :class="['message', msg.me && 'me']" v-for="msg in chatMessage" :key="msg.id">
+                    <span :class="['msg', msg.me && 'me']">
+                        {{ msg.message }}
+                        <div class="options" @click="toggleOptions(msg)">
+                            <i class="fas fa-chevron-down"></i>
+                            <transition name="fade">
+                                <div class="menu" v-if="menuOptions !== null && menuOptions === msg.id">
+                                    <li v-if="msg.me">Dados da mensagem</li>
+                                    <li>Responder</li>
+                                    <li>Encaminhar mensagem</li>
+                                    <li>Favoritar mensagem</li>
+                                    <li @click="deleteMessage(msg)">Apagar mensagem</li>
+                                </div>
+                            </transition>
                         </div>
-                    </transition>
+                        <span class="hours">{{ msg.time }}</span>
+                    </span>
                 </div>
-            </div>
+            </transition-group>
         </div>
         <div class="messages" v-else>
-            <div class="message me">Enter a message below and start your chat with {{ userChat.name }}</div>
+            <div class="message me">
+                <span class="msg me">Mande uma mensagem abaixo para começar o chat com <b>{{ userChat.name }}</b>.</span></div>
         </div>
         <div class="input">
             <input class="input-message" @keyup.enter="enterMessage" :placeholder="`Digite algo para ${userChat.name}`">
@@ -37,7 +43,8 @@ export default {
             visibility: false,
             userChat: [],
             messages: [],
-            menuOptions: null
+            menuOptions: null,
+            date: new Date
         }
     },
 
@@ -100,8 +107,11 @@ export default {
             let messageObj = {
                 from: this.myUser.id,
                 to: this.userChat.id,
-                message
+                message,
+                time: `${this.date.getHours()}:${this.date.getMinutes()}`
             };
+
+            console.log(messageObj)
 
             window.chatEventBus.$emit('sendPrivateMessage', messageObj);
             this.pushMessage(messageObj);
@@ -126,6 +136,7 @@ export default {
         messageFormat(data) {
             return {
                 message: data.message,
+                time: data.time,
                 id: Math.floor(Math.random() * 100000 + 1),
                 me: (data.from === this.myUser.id)
             };

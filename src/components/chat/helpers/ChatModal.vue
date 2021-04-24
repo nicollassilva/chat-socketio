@@ -1,9 +1,11 @@
 <template>
-    <div class="chat-modal" @click.self="close" v-if="visible">
-        <div class="box-modal">
-            <span class="title">{{ getTitle() }}</span>
+    <transition name="fade">
+        <div class="chat-modal" @click.self="close" v-if="visible">
+            <div class="box-modal">
+                <span class="title">{{ getTitle() }}</span>
+            </div>
         </div>
-    </div>
+    </transition>
 </template>
 <script>
 export default {
