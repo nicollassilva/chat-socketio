@@ -215,7 +215,7 @@ body:before {
             position: relative;
             float: left;
             padding: 10px;
-            overflow-y: auto;
+            overflow: hidden auto;
             display: flex;
             flex-direction: column;
 
@@ -224,22 +224,64 @@ body:before {
 
             .message {
                 width: 50%;
+                max-width: 50%;
                 margin: 0 5px;
                 position: relative;
                 height: auto;
-                padding: 8px 10px;
+                padding: 8px 30px 8px 10px;
+                word-break: break-word;
                 background-color: #535c68;
                 margin-top: 10px;
                 font-size: 14px;
                 border-radius: 10px;
                 color: rgba(255, 255, 255, .7);
 
-                &:not(.me) { border-bottom-left-radius: 0px; }
+                &:not(.me) { border-top-left-radius: 0px; }
                 
                 &.me {
                     background-color: #5e656e;
                     margin-left: auto;
-                    border-bottom-right-radius: 0px;
+                    border-top-right-radius: 0px;
+                }
+
+                .options {
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    cursor: pointer;
+                    color: rgba(255, 255, 255, .7);
+
+                    i { visibility: hidden; }
+
+                    .menu {
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        width: 200px;
+                        height: auto;
+                        padding: 5px;
+                        background-color: $background;
+                        box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.1);
+                        border-radius: 5px;
+                        z-index: 2;
+
+                        li {
+                            width: 100%;
+                            float: left;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 14px;
+                            height: 35px;
+                            color: rgba(255, 255, 255, .8);
+                        }
+                    }
+                }
+
+                &:hover {
+                    .options {
+                        i { visibility: visible; }
+                    }
                 }
             }
         }

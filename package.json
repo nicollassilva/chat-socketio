@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "watch": "vue-cli-service serve --watch",
-    "socket": "node src/server"
+    "socket": "node src/socket/server"
   },
   "dependencies": {
     "bootstrap": "^4.6.0",
