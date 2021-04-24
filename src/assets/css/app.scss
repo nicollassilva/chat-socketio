@@ -272,8 +272,13 @@ body:before {
                             justify-content: center;
                             align-items: center;
                             font-size: 14px;
-                            height: 35px;
+                            height: 40px;
                             color: rgba(255, 255, 255, .8);
+                            border-radius: 5px;
+
+                            &:hover {
+                                background-color: rgba(255, 255, 255, .05);
+                            }
                         }
                     }
                 }
@@ -327,3 +332,32 @@ body:before {
 
 .fade-enter,
 .fade-leave-to { opacity: 0; }
+
+.chat-modal {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .box-modal {
+        width: 300px;
+        min-height: 100px;
+        overflow: hidden auto;
+        background-color: #636e72;
+        border-radius: 10px;
+        padding: 10px;
+
+        span.title {
+            width: 100%;
+            float: left;
+            font-size: 20px;
+            color: rgba(255, 255, 255, .7);
+        }
+    }
+}

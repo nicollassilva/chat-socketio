@@ -12,7 +12,7 @@
                             <li>Responder</li>
                             <li>Encaminhar mensagem</li>
                             <li>Favoritar mensagem</li>
-                            <li>Apagar mensagem</li>
+                            <li @click="deleteMessage(msg)">Apagar mensagem</li>
                         </div>
                     </transition>
                 </div>
@@ -75,6 +75,14 @@ export default {
     },
 
     methods: {
+
+        deleteMessage(message) {
+            window.chatEventBus.$emit('Modal', {
+                type: 'deleteMessage',
+                data: message
+            });
+        },
+
         toggleOptions(msg) {
             this.menuOptions = this.menuOptions != msg.id ? msg.id : null;
         },

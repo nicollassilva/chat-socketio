@@ -1,20 +1,22 @@
 <template>
     <div>
         <div class="principalscreen">
-            <PeoplesGroups v-if="redirect" :users="usersConnected" />
+            <MenuBar v-if="redirect" :users="usersConnected" />
             <Chat />
+            <ChatModal />
         </div>
     </div>
 </template>
 <script>
-import io from 'socket.io-client';
-import PeoplesGroups from "./content/PeoplesGroups.vue"
+import IOClient from 'socket.io-client';
+import MenuBar from "./content/MenuBar.vue"
 import Chat from "./content/Chat.vue"
 import Objects from '../../socket/functions/Objects.js'
+import ChatModal from './helpers/ChatModal.vue'
 
 export default {
     name: "PrincipalScreen",
-    components: { PeoplesGroups, Chat },
+    components: { MenuBar, Chat, ChatModal },
     data() {
         return {
             redirect: false,
@@ -37,17 +39,17 @@ export default {
     },
     
     mounted() { 
-        this.watchConnects();
+        this.watchSocketEvents();
     },
 
     methods: {
 
         initSocket() {
-            this.socket = io('http://localhost:3000', { transports: ['websocket'] });
+            this.socket = IOClient('http://localhost:3000', { transports: ['websocket'] });
             this.socket.emit('userConnected', window.chatEventBus.username);
         },
 
-        watchConnects() {
+        watchSocketEvents() {
             this.socket.on('connected', event => {
                 this.usersConnected = event.reverse();
             })
