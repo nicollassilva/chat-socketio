@@ -1,80 +1,84 @@
 <template>
     <div class="chat" v-if="visibility">
-        <div class="topbar">{{ userChat.name }}</div>
-        <div class="messages" v-if="Array.isArray(messages) && chatMessage.length > 0">
+        <div class="topbar">{{ userConnected.name }}</div>
+        <div class="messages" v-if="Array.isArray(chats) && chatMessage.length > 0">
             <transition-group name="fade">
-                <div :class="['message', msg.me && 'me']" v-for="msg in chatMessage" :key="msg.id">
-                    <span :class="['msg', msg.me && 'me']">
-                        {{ msg.message }}
-                        <div class="options" @click="toggleOptions(msg)">
+                <div :class="['message', message.me && 'me']" v-for="message in chatMessage" :key="message.id">
+                    <span :class="['msg', message.me && 'me']">
+                        {{ message.content }}
+                        <div class="options" @click="toggleOptions(message)">
                             <i class="fas fa-chevron-down"></i>
                             <transition name="fade">
-                                <div class="menu" v-if="menuOptions !== null && menuOptions === msg.id">
-                                    <li v-if="msg.me">Dados da mensagem</li>
+                                <div class="menu" v-if="menuOptions !== null && menuOptions === message.id">
+                                    <li v-if="message.me">Dados da mensagem</li>
                                     <li>Responder</li>
                                     <li>Encaminhar mensagem</li>
                                     <li>Favoritar mensagem</li>
-                                    <li @click="deleteMessage(msg)">Apagar mensagem</li>
+                                    <li @click="deleteMessage(message)">Apagar mensagem</li>
                                 </div>
                             </transition>
                         </div>
-                        <span class="hours">{{ msg.time }}</span>
+                        <span class="hours">{{ message.time }}</span>
                     </span>
                 </div>
             </transition-group>
         </div>
         <div class="messages" v-else>
             <div class="message me">
-                <span class="msg me">Mande uma mensagem abaixo para começar o chat com <b>{{ userChat.name }}</b>.</span></div>
+                <span class="msg me">Mande uma mensagem abaixo para começar o chat com <b>{{ userConnected.name }}</b>.</span></div>
         </div>
         <div class="input">
-            <input class="input-message" @keyup.enter="enterMessage" :placeholder="`Digite algo para ${userChat.name}`">
+            <input class="input-message" @keyup.enter="storeMessage" :placeholder="`Digite algo para ${userConnected.name}`">
         </div>
     </div>
 </template>
 <script>
+import ChatEngine from '../data/ChatEngine';
 
 export default {
     name: "Chat",
 
     data() {
         return {
-            myUser: null,
+            userConnected: null,
             visibility: false,
-            userChat: [],
             messages: [],
-            menuOptions: null,
-            date: new Date
+            userChat: [],
+            chats: [],
+            menuOptions: null
         }
     },
 
     computed: {
         chatMessage() {
-            let filter = this.messages.length > 0 && this.messages.filter(e => e.users && e.users.includes(this.myUser.id) && e.users.includes(this.userChat.id));
+            let chatInstance = this.getChatInstance();
 
-            return Array.isArray(filter) && filter.length > 0 ? filter[0].historic : [];
+            if(!chatInstance) return;
+
+            return chatInstance.messages;
         }
     },
 
     mounted() {
-        setTimeout(() => this.myUser = window.chatEventBus.user, 1000);
-
         window.chatEventBus.$on('chat', event => {
-            if(event.name && event.id) {
-                if(this.userChat.name != event.name) {
-                    this.userChat = event
-                    this.visibility = true
-                }
-            }
+            if(!event.name && !event.id) return;
+
+            this.initChat(event);
+            this.setUser(event);
         });
 
         window.chatEventBus.$on('receivePrivateMessage', event => {
-            this.pushMessage(event);
+            let senderUser = event.from;
+
+            this.initChat(senderUser);
+            this.storeMessage(event, false, senderUser.id);
         });
 
         window.chatEventBus.$on('userDisconnect', event => {
             console.log(event)
         });
+
+        window.chatEventBus.$on('deleteMessage', event => this.deleteMessage(event, true));
     },
 
     updated() {
@@ -83,70 +87,61 @@ export default {
 
     methods: {
 
-        deleteMessage(message) {
-            window.chatEventBus.$emit('Modal', {
-                type: 'deleteMessage',
-                data: message
-            });
-        },
+        setUser(user) {
+            if(!this.userConnected) {
+                this.userConnected = user;
+                this.visibility = true;
+                return;
+            }
 
-        toggleOptions(msg) {
-            this.menuOptions = this.menuOptions != msg.id ? msg.id : null;
-        },
-
-        enterMessage(event) {
-            let inputMessage = event.target.value
-
-            if(inputMessage.length < 1) return;
-
-            this.sendPrivateMessage(inputMessage);
-            event.target.value = '';
-        },
-
-        sendPrivateMessage(message) {
-            let messageObj = {
-                from: this.myUser.id,
-                to: this.userChat.id,
-                message,
-                time: `${this.date.getHours()}:${this.date.getMinutes()}`
-            };
-
-            console.log(messageObj)
-
-            window.chatEventBus.$emit('sendPrivateMessage', messageObj);
-            this.pushMessage(messageObj);
-        },
-
-        checkMessage(from, to) {
-            return !!this.messages.filter(e => e.users && e.users.includes(from) && e.users.includes(to)).length;
-        },
-
-        pushMessage(data) {
-            if(this.checkMessage(data.to, data.from)) {
-                this.messages.forEach(chat => {
-                    if(chat.users.includes(data.from) && chat.users.includes(data.to)) {
-                        chat.historic.push(this.messageFormat(data));
-                    }
-                });
-            } else {
-                this.saveChat(data);
+            if(this.userConnected.id != user.id) {
+                this.userConnected = user;
+                this.visibility = true;
             }
         },
 
-        messageFormat(data) {
-            return {
-                message: data.message,
-                time: data.time,
-                id: Math.floor(Math.random() * 100000 + 1),
-                me: (data.from === this.myUser.id)
-            };
+        storeMessage(event, inputEvent = true, senderUser = null) {
+            let message = inputEvent ? event.target.value : event;
+
+            if(inputEvent) {
+                if(message.length < 1) return;
+
+                event.target.value = '';
+            }
+
+            let newMessage = this.getChatInstance(senderUser).store(message, !inputEvent);
+
+            if(inputEvent) this.privateMessageEmit(newMessage);
         },
 
-        saveChat(data) {
-            this.messages.push({
-                users: [data.from, data.to],
-                historic: [this.messageFormat(data)]
+        privateMessageEmit(message) {
+            window.chatEventBus.$emit('sendPrivateMessage', {
+                from: window.chatEventBus.user,
+                to: this.userConnected.id,
+                ...message
             });
+        },
+
+        getChatInstance(userId = null) {
+            if(!this.userConnected && !userId) return;
+
+            if(!userId) userId = this.userConnected.id;
+            
+            return this.chats.find(chat => chat.userConnected.id === userId);
+        },
+
+        initChat(userObject) {
+            let chatStarted = this.getChatInstance(userObject.id);
+
+            if(chatStarted) return;
+
+            this.chats.push(
+                new ChatEngine(userObject)
+            );
+        },
+
+        toggleOptions(message) {
+            this.menuOptions = this.menuOptions != message.id ? message.id : null;
         },
 
         adjustContainerScroll() {

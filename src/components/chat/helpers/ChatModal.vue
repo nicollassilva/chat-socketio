@@ -3,6 +3,11 @@
         <div class="chat-modal" @click.self="close" v-if="visible">
             <div class="box-modal">
                 <span class="title">{{ getTitle() }}</span>
+                <div class="buttons">
+                    <button @click="deleteMessage" v-if="isModal('deleteMessage')" class="danger">Apagar para todos</button>
+                    <button @click="deleteMessage" v-if="isModal('deleteMessage')" class="danger">Apagar para mim</button>
+                    <button @click="close" v-if="isModal('deleteMessage')" class="inline danger">Cancelar</button>
+                </div>
             </div>
         </div>
     </transition>
@@ -20,14 +25,23 @@ export default {
     mounted() {
         window.chatEventBus.$on('Modal', event => {
             if(event.type != this.modalOpened) {
-                this.modalOpened = event.type
-                this.modalData = event.data
-                this.visible = true
+                this.modalOpened = event.type;
+                this.modalData = event.data;
+                this.visible = true;
             }
         });
     },
 
     methods: {
+
+        deleteMessage() {
+            window.chatEventBus.$emit('deleteMessage', this.modalData)
+        },
+
+        isModal(modal) {
+            return this.modalOpened === modal;
+        },
+
         close() {
             this.visible = !this.visible;
             this.resetModal();

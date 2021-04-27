@@ -276,7 +276,7 @@ body:before {
 
                     .hours {
                         position: absolute;
-                        right: 4px;
+                        right: 5px;
                         bottom: 2px;
                         font-size: 11px;
                         color: rgba(0, 0, 0, 0.4);
@@ -363,8 +363,8 @@ body:before {
     &.offline { background-color: #aaa; }
 }
 
-.fade-enter-active,
-.fade-leave-active { transition: opacity .5s; }
+.fade-enter-active { transition: opacity .5s; }
+.fade-leave-active { transition: opacity 0s; }
 
 .fade-enter,
 .fade-leave-to { opacity: 0; }
@@ -382,18 +382,49 @@ body:before {
     align-items: center;
 
     .box-modal {
-        width: 300px;
+        width: 400px;
         min-height: 100px;
         overflow: hidden auto;
         background-color: $background;
-        border-radius: 10px;
+        border-radius: 5px;
         padding: 20px;
+        box-shadow: 0 0 5px 3px rgba(0, 0, 0, .4);
 
         span.title {
             width: 100%;
             float: left;
             font-size: 20px;
+            margin-bottom: 30px;
             color: rgba(255, 255, 255, .7);
+        }
+
+        .buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+
+            button {
+                padding: 6px 10px;
+                background-color: transparent;
+                border: none;
+                margin-top: 8px;
+                color: white;
+                font-size: 14px;
+                border-radius: 5px;
+
+                &:not(.inline).success { background-color: $green; }
+                &:not(.inline).danger { background-color: $red; }
+                &:not(.inline).warning { background-color: $yellow; }
+
+                &:not(.inline):hover { opacity: 0.9; }
+
+                &.inline {
+                    &.success { border: 1px solid $green; color: $green; }
+                    &.danger { border: 1px solid $red; color: $red; }
+                    &.warning { border: 1px solid $yellow; color: $yellow; }
+                }
+            }
         }
     }
 }
