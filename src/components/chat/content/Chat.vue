@@ -20,7 +20,7 @@
                         </div>
                         <span class="hours">{{ message.time }}</span>
                     </span>
-                    <span :class="['msg', message.me && 'me']" v-else>
+                    <span :class="['msg', 'text-danger', 'font-weight-bold', message.me && 'me']" v-else>
                         <i class="fas fa-ban mr-2"></i>Essa mensagem foi deletada.
                     </span>
                 </div>

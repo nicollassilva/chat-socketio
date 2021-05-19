@@ -15,11 +15,11 @@
     </div>
 </template>
 <script>
-import Peoples from '../types/Peoples.vue'
 import Groups from '../types/Groups.vue'
+import Peoples from '../types/Peoples.vue'
 
 export default {
-    name: "PeoplesGroups",
+    name: "Menu",
     props: {
         users: Array
     },

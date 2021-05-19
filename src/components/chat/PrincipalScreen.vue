@@ -1,22 +1,22 @@
 <template>
     <div>
         <div class="principalscreen">
-            <MenuBar v-if="redirect" :users="usersConnected" />
+            <Menu v-if="redirect" :users="usersConnected" />
             <Chat />
             <ChatModal />
         </div>
     </div>
 </template>
 <script>
-import IOClient from 'socket.io-client';
-import MenuBar from "./content/MenuBar.vue"
+import Menu from "./content/Menu.vue"
 import Chat from "./content/Chat.vue"
-import Objects from '../../socket/functions/Objects.js'
+import IOClient from 'socket.io-client';
 import ChatModal from './helpers/ChatModal.vue'
+import Objects from '../../socket/functions/Objects.js'
 
 export default {
     name: "PrincipalScreen",
-    components: { MenuBar, Chat, ChatModal },
+    components: { Menu, Chat, ChatModal },
     data() {
         return {
             redirect: false,

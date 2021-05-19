@@ -4,7 +4,7 @@
             <div class="box-modal">
                 <span class="title">{{ getTitle() }}</span>
                 <div class="buttons">
-                    <button @click="deleteMessage(true)" v-if="isModal('deleteMessage')" class="danger">Apagar para todos</button>
+                    <button @click="deleteMessage(true)" v-if="isModal('deleteMessage') && modalData.me" class="danger">Apagar para todos</button>
                     <button @click="deleteMessage()" v-if="isModal('deleteMessage')" class="danger">Apagar para mim</button>
                     <button @click="close" v-if="isModal('deleteMessage')" class="inline danger">Cancelar</button>
                 </div>
