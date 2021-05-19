@@ -349,7 +349,7 @@ body:before {
             margin-top: 10px;
 
             .options-message {
-                width: 150px;
+                width: auto;
                 height: 50px;
                 margin-right: 10px;
                 float: left;
@@ -372,7 +372,7 @@ body:before {
             }
 
             textarea {
-                width: calc(100% - 220px);
+                min-width: calc(100% - 220px);
                 height: 50px;
                 background-color: $background;
                 padding: 10px;

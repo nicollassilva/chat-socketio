@@ -48,6 +48,7 @@
             <div class="input">
                 <div class="options-message">
                     <button class="send-image" @click="openFile()"><i class="far fa-image"></i></button>
+                    <button class="send-image"><i class="far fa-smile"></i></button>
                 </div>
                 <textarea class="input-message" @keyup.13.exact="storeMessage($event.target)" ref="input" :placeholder="`Digite algo para ${userConnected.name}`"></textarea>
                 <button class="enter-message" @click="storeMessage($refs.input)"><i class="far fa-paper-plane"></i></button>
