@@ -1,7 +1,7 @@
 // Server/SocketIO constants
 const Express = require('express')();
 const Http = require('http').Server(Express)
-const Socketio = require('socket.io')(Http)
+const IO = require('socket.io')(Http)
 
 // Functions
 const Server = require('./functions/Server');
@@ -9,7 +9,7 @@ const Server = require('./functions/Server');
 // Data Server
 const Users = require('./system/Users');
 
-Socketio.on('connection', socket => {
+IO.on('connection', socket => {
     socket.on('userConnected', event => {
         Server.userConnectedLog(event, socket);
 
@@ -17,7 +17,7 @@ Socketio.on('connection', socket => {
         Users.store(myData);
 
         socket.emit('myData', myData);
-        Socketio.emit('connected', Users.index());
+        IO.emit('connected', Users.index());
     })
 
     socket.on('disconnect', event => {
@@ -25,10 +25,11 @@ Socketio.on('connection', socket => {
         Server.userDisconnectLog(user, socket);
         Users.delete(socket.id);
         
-        Socketio.emit('userDisconnected', user);
+        IO.emit('userDisconnected', user);
     })
 
     socket.on('sendPrivateMessage', event => socket.to(event.to).emit('receivePrivateMessage', event));
+    socket.on('deleteMessage', event => socket.to(event.user).emit('deleteMessage', event));
 })
 
 Http.listen(3000, () => {

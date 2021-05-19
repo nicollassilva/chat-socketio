@@ -4,7 +4,7 @@
         <div class="messages" v-if="Array.isArray(chats) && chatMessage.length > 0">
             <transition-group name="fade">
                 <div :class="['message', message.me && 'me']" v-for="message in chatMessage" :key="message.id">
-                    <span :class="['msg', message.me && 'me']">
+                    <span v-if="!message.deleted" :class="['msg', message.me && 'me']">
                         {{ message.content }}
                         <div class="options" @click="toggleOptions(message)">
                             <i class="fas fa-chevron-down"></i>
@@ -14,11 +14,14 @@
                                     <li>Responder</li>
                                     <li>Encaminhar mensagem</li>
                                     <li>Favoritar mensagem</li>
-                                    <li @click="deleteMessage(message)">Apagar mensagem</li>
+                                    <li @click="sendDeleteMessage(message)">Apagar mensagem</li>
                                 </div>
                             </transition>
                         </div>
                         <span class="hours">{{ message.time }}</span>
+                    </span>
+                    <span :class="['msg', message.me && 'me']" v-else>
+                        <i class="fas fa-ban mr-2"></i>Essa mensagem foi deletada.
                     </span>
                 </div>
             </transition-group>
@@ -78,7 +81,7 @@ export default {
             console.log(event)
         });
 
-        window.chatEventBus.$on('deleteMessage', event => this.deleteMessage(event, true));
+        window.chatEventBus.$on('deleteMessageForMe', event => this.deleteMessage(event));
     },
 
     updated() {
@@ -86,6 +89,17 @@ export default {
     },
 
     methods: {
+        sendDeleteMessage(message) {
+            window.chatEventBus.$emit('ChatModal', {
+                type: 'deleteMessage',
+                data: message,
+                user: this.userConnected.id
+            });
+        },
+
+        deleteMessage(event) {
+            this.getChatInstance().update(event.id, 'deleted', true);
+        },
 
         setUser(user) {
             if(!this.userConnected) {

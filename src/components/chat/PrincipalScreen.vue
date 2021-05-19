@@ -28,13 +28,14 @@ export default {
         this.initSocket();
 
         this.socket.on('myData', event => (window.chatEventBus.user = event, this.redirect = true));
+        this.socket.on('receivePrivateMessage', event => window.chatEventBus.$emit('receivePrivateMessage', event));
+        this.socket.on('deleteMessage', event => window.chatEventBus.$emit('deleteMessageForMe', event));
 
-        window.chatEventBus.$on('sendPrivateMessage', event => {
-            this.socket.emit('sendPrivateMessage', event);
-        });
+        window.chatEventBus.$on('sendPrivateMessage', event => this.socket.emit('sendPrivateMessage', event));
 
-        this.socket.on('receivePrivateMessage', event => {
-            window.chatEventBus.$emit('receivePrivateMessage', event);
+        window.chatEventBus.$on('deleteMessageForAll', event => {
+            window.chatEventBus.$emit('deleteMessageForMe', event);
+            this.socket.emit('deleteMessage', event);
         });
     },
     

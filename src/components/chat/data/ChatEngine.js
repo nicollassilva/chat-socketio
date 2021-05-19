@@ -26,6 +26,14 @@ class ChatEngine {
         return this.show(id);
     }
 
+    update(id, attr, value) {
+        let message = this.show(id);
+
+        if(!message) return;
+
+        message[attr] = value;
+    }
+
     getMessageTime() {
         let date = new Date,
             hours = date.getHours(),

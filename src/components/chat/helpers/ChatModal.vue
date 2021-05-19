@@ -4,8 +4,8 @@
             <div class="box-modal">
                 <span class="title">{{ getTitle() }}</span>
                 <div class="buttons">
-                    <button @click="deleteMessage" v-if="isModal('deleteMessage')" class="danger">Apagar para todos</button>
-                    <button @click="deleteMessage" v-if="isModal('deleteMessage')" class="danger">Apagar para mim</button>
+                    <button @click="deleteMessage(true)" v-if="isModal('deleteMessage')" class="danger">Apagar para todos</button>
+                    <button @click="deleteMessage()" v-if="isModal('deleteMessage')" class="danger">Apagar para mim</button>
                     <button @click="close" v-if="isModal('deleteMessage')" class="inline danger">Cancelar</button>
                 </div>
             </div>
@@ -23,19 +23,23 @@ export default {
     },
 
     mounted() {
-        window.chatEventBus.$on('Modal', event => {
+        window.chatEventBus.$on('ChatModal', event => {
             if(event.type != this.modalOpened) {
                 this.modalOpened = event.type;
-                this.modalData = event.data;
+                this.modalData = { ...event.data, user: event.user };
                 this.visible = true;
             }
         });
     },
 
     methods: {
-
-        deleteMessage() {
-            window.chatEventBus.$emit('deleteMessage', this.modalData)
+        deleteMessage(forAll = false) {
+            if(forAll) {
+                window.chatEventBus.$emit('deleteMessageForAll', this.modalData);
+                return;
+            }
+            
+            window.chatEventBus.$emit('deleteMessageForMe', this.modalData);
         },
 
         isModal(modal) {
