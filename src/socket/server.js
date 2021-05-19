@@ -30,6 +30,7 @@ IO.on('connection', socket => {
 
     socket.on('sendPrivateMessage', event => socket.to(event.to).emit('receivePrivateMessage', event));
     socket.on('deleteMessage', event => socket.to(event.user).emit('deleteMessage', event));
+    socket.on('sendImage', event => socket.to(event.to).emit('receiveImage', event));
 })
 
 Http.listen(3000, () => {

@@ -12,15 +12,16 @@ class ChatEngine {
         return this.messages.find(message => message.id === id);
     }
 
-    store(data, isObject = false) {
+    store(data, isObject = false, image = false) {
         let id = Math.floor(Math.random() * 100000 + 1);
 
         this.messages.push({
-            id: isObject ? data.id : id,
-            content: isObject ? data.content : data,
+            id: isObject && !image ? data.id : id,
+            content: isObject && !image ? data.content : data,
             time: this.getMessageTime(),
             me: !isObject,
-            deleted: false
+            deleted: false,
+            image
         });
 
         return this.show(id);

@@ -27,8 +27,8 @@ export default {
             if(event.type != this.modalOpened) {
                 this.modalOpened = event.type;
                 this.modalData = { ...event.data, user: event.user };
-                this.visible = true;
             }
+            this.visible = true;
         });
     },
 
@@ -36,10 +36,11 @@ export default {
         deleteMessage(forAll = false) {
             if(forAll) {
                 window.chatEventBus.$emit('deleteMessageForAll', this.modalData);
-                return;
+            } else {
+                window.chatEventBus.$emit('deleteMessageForMe', this.modalData);
             }
             
-            window.chatEventBus.$emit('deleteMessageForMe', this.modalData);
+            this.close();
         },
 
         isModal(modal) {
