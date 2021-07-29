@@ -1,8 +1,21 @@
 import Vue from "vue";
-import ChatInit from "./ChatInit.vue";
+import Viewer from 'v-viewer';
 import "./assets/css/app.scss";
+import 'viewerjs/dist/viewer.css'
+import ChatInit from "./ChatInit.vue";
 
 require('./bootstrap');
+
+Vue.use(Viewer);
+
+Viewer.setDefaults({
+  navbar: false,
+  title: false,
+  tooltip: false,
+  movable: false,
+  zoomable: false,
+  scalable: false
+});
 
 /**
  * Event bus

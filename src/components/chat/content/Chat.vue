@@ -29,7 +29,7 @@
                         </template>
                         <template v-else>
                             <span v-if="!message.deleted" :class="['msg', message.me && 'me']">
-                                <div class="renderImage">
+                                <div class="renderImage" v-viewer>
                                     <img :src="message.content">
                                 </div>
                                 <span class="hours">{{ message.time }}</span>
