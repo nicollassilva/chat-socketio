@@ -251,7 +251,8 @@ body:before {
                     background-color: #f1f2f6;
                     border-radius: 5px;
                     position: relative;
-                    white-space: pre-line;
+                    white-space: normal;
+                    max-width: 100% !important;
 
                     &.me {
                         background-color: #b9c3cf;
@@ -329,6 +330,7 @@ body:before {
                         background-repeat: no-repeat;
                         background-size: contain;
                         position: relative;
+                        cursor: pointer;
 
                         img {
                             width: 100%;

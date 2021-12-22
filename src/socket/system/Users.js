@@ -35,7 +35,8 @@ class Users {
         return {
             id: socket.id,
             name,
-            address: socket.handshake.address
+            address: socket.handshake.address,
+            disconnected: false
         };
     }
 }

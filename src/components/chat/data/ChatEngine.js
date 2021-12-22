@@ -12,7 +12,7 @@ class ChatEngine {
         return this.messages.find(message => message.id === id);
     }
 
-    store(data, isObject = false, image = false) {
+    store(data, isObject = false, image = false, isWarning = false) {
         let id = Math.floor(Math.random() * 100000 + 1);
 
         this.messages.push({
@@ -21,7 +21,8 @@ class ChatEngine {
             time: this.getMessageTime(),
             me: !isObject,
             deleted: false,
-            image
+            image,
+            isWarning
         });
 
         return this.show(id);

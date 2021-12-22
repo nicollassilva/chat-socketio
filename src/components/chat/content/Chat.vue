@@ -7,36 +7,11 @@
                 <transition-group name="fade">
                     <div :class="['message', message.me && 'me']" v-for="message in chatMessage" :key="message.id">
                         <template v-if="!message.image">
-                            <span v-if="!message.deleted" :class="['msg', message.me && 'me']">
-                                {{ message.content }}
-                                <div class="options" @click="toggleOptions(message)">
-                                    <i class="fas fa-chevron-down"></i>
-                                    <transition name="fade">
-                                        <div class="menu" v-if="menuOptions !== null && menuOptions === message.id">
-                                            <li v-if="message.me">Dados da mensagem</li>
-                                            <li>Responder</li>
-                                            <li>Encaminhar mensagem</li>
-                                            <li>Favoritar mensagem</li>
-                                            <li @click="sendDeleteMessage(message)">Apagar mensagem</li>
-                                        </div>
-                                    </transition>
-                                </div>
-                                <span class="hours">{{ message.time }}</span>
-                            </span>
-                            <span :class="['msg', 'text-danger', 'font-weight-bold', message.me && 'me']" v-else>
-                                <i class="fas fa-ban mr-2"></i>Essa mensagem foi deletada.
-                            </span>
+                            <DefaultMessage :message="message" />
                         </template>
                         <template v-else>
-                            <span v-if="!message.deleted" :class="['msg', message.me && 'me']">
-                                <div class="renderImage" v-viewer>
-                                    <img :src="message.content">
-                                </div>
-                                <span class="hours">{{ message.time }}</span>
-                            </span>
-                            <span :class="['msg', 'text-danger', 'font-weight-bold', message.me && 'me']" v-else>
-                                <i class="fas fa-ban mr-2"></i>Essa imagem foi deletada.
-                            </span>
+                            <ImageMessage :message="message" v-if="!message.deleted" />
+                            <DeletedMessage :message="message" v-else />
                         </template>
                     </div>
                 </transition-group>
@@ -58,9 +33,13 @@
 </template>
 <script>
 import ChatEngine from '../data/ChatEngine';
+import ImageMessage from '../data/MessageTypes/ImageMessage';
+import DefaultMessage from '../data/MessageTypes/DefaultMessage';
 
 export default {
     name: "Chat",
+
+    components: { DefaultMessage, ImageMessage },
 
     data() {
         return {
@@ -69,7 +48,6 @@ export default {
             messages: [],
             userChat: [],
             chats: [],
-            menuOptions: null
         }
     },
 
@@ -106,6 +84,7 @@ export default {
         });
 
         window.chatEventBus.$on('deleteMessageForMe', event => this.deleteMessage(event));
+        window.chatEventBus.$on('userDisconnected', event => this.userDisconnected(event));
 
         this.addImageFileLoaderListener();
     },
@@ -115,6 +94,12 @@ export default {
     },
 
     methods: {
+        userDisconnected(user) {
+            if(this.userConnected.id == user.id) {
+                this.storeMessage({content: 'Esse usuário desconectou!'})
+            }
+        },
+
         addImageFileLoaderListener() {
             this.$refs.imageLoader.onchange = (evt) => {
                 let target = evt.target || window.event.srcElement,
@@ -125,7 +110,10 @@ export default {
                     imageFileReader.readAsDataURL(files[0]);
 
                     imageFileReader.onload = (e) => {
-                        window.chatEventBus.$emit('sendImage', { to: this.userConnected.id, from: window.chatEventBus.user, buffer: e.target.result });
+                        let imageBuffer = e.target.result
+
+                        window.chatEventBus.$emit('sendImage', { to: this.userConnected.id, from: window.chatEventBus.user, buffer: imageBuffer });
+                        this.storeImageMessage(this.userConnected, imageBuffer, false)
 
                         this.$refs.imageLoader.value = '';
                         return;
@@ -138,16 +126,8 @@ export default {
             this.$refs.imageLoader.click();
         },
 
-        sendDeleteMessage(message) {
-            window.chatEventBus.$emit('ChatModal', {
-                type: 'deleteMessage',
-                data: message,
-                user: this.userConnected.id
-            });
-        },
-
-        deleteMessage(event) {
-            this.getChatInstance().update(event.id, 'deleted', true);
+        deleteMessage(message) {
+            this.getChatInstance().update(message.id, 'deleted', true);
         },
 
         setUser(user) {
@@ -163,8 +143,8 @@ export default {
             }
         },
 
-        storeImageMessage(senderUser, image) {
-            this.getChatInstance(senderUser.id).store(image, true, true);
+        storeImageMessage(senderUser, image, receivedImage = true) {
+            this.getChatInstance(senderUser.id).store(image, receivedImage, true);
         },
 
         storeMessage(event, inputEvent = true, senderUser = null) {
@@ -200,17 +180,11 @@ export default {
         initChat(userObject) {
             let chatStarted = this.getChatInstance(userObject.id);
 
-            console.log(userObject)
-
             if(chatStarted) return;
 
             this.chats.push(
                 new ChatEngine(userObject)
             );
-        },
-
-        toggleOptions(message) {
-            this.menuOptions = this.menuOptions != message.id ? message.id : null;
         },
 
         adjustContainerScroll() {

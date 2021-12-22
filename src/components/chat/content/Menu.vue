@@ -15,8 +15,8 @@
     </div>
 </template>
 <script>
-import Groups from '../types/Groups.vue'
-import Peoples from '../types/Peoples.vue'
+import Groups from './MenuTypes/Groups.vue'
+import Peoples from './MenuTypes/Peoples.vue'
 
 export default {
     name: "Menu",
