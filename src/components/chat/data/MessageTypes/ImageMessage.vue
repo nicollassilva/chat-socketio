@@ -3,11 +3,15 @@
         <div class="renderImage" v-viewer>
             <img :src="message.content">
         </div>
+        <message-options :userConnected="userConnected" :message="message" />
         <span class="hours">{{ message.time }}</span>
     </span>
 </template>
 <script>
+import MessageOptions from '../MessageHandler/MessageOptions.vue'
+
 export default {
-    props: ['message']
+    components: { MessageOptions },
+    props: ['message', 'userConnected']
 }
 </script>

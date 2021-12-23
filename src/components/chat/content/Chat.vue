@@ -7,11 +7,11 @@
                 <transition-group name="fade">
                     <div :class="['message', message.me && 'me']" v-for="message in chatMessage" :key="message.id">
                         <template v-if="!message.image">
-                            <DefaultMessage :message="message" />
+                            <default-message :userConnected="userConnected" :message="message" />
                         </template>
                         <template v-else>
-                            <ImageMessage :message="message" v-if="!message.deleted" />
-                            <DeletedMessage :message="message" v-else />
+                            <image-message :userConnected="userConnected" :message="message" v-if="!message.deleted" />
+                            <deleted-message :message="message" v-else />
                         </template>
                     </div>
                 </transition-group>
@@ -33,13 +33,14 @@
 </template>
 <script>
 import ChatEngine from '../data/ChatEngine';
-import ImageMessage from '../data/MessageTypes/ImageMessage';
-import DefaultMessage from '../data/MessageTypes/DefaultMessage';
+import ImageMessage from '../data/MessageTypes/ImageMessage.vue';
+import DefaultMessage from '../data/MessageTypes/DefaultMessage.vue';
+import DeletedMessage from '../data/MessageTypes/DeletedMessage.vue';
 
 export default {
     name: "Chat",
 
-    components: { DefaultMessage, ImageMessage },
+    components: { DefaultMessage, ImageMessage, DeletedMessage },
 
     data() {
         return {
@@ -76,7 +77,7 @@ export default {
 
         window.chatEventBus.$on('renderImage', event => {
             this.initChat(event.from);
-            this.storeImageMessage(event.from, event.buffer);
+            this.storeImageMessage(event.from, event.message);
         })
 
         window.chatEventBus.$on('userDisconnect', event => {
@@ -112,8 +113,9 @@ export default {
                     imageFileReader.onload = (e) => {
                         let imageBuffer = e.target.result
 
-                        window.chatEventBus.$emit('sendImage', { to: this.userConnected.id, from: window.chatEventBus.user, buffer: imageBuffer });
-                        this.storeImageMessage(this.userConnected, imageBuffer, false)
+                        let messageData = this.storeImageMessage(this.userConnected, imageBuffer, false)
+
+                        window.chatEventBus.$emit('sendImage', { to: this.userConnected.id, from: window.chatEventBus.user, message: messageData });
 
                         this.$refs.imageLoader.value = '';
                         return;
@@ -127,6 +129,7 @@ export default {
         },
 
         deleteMessage(message) {
+            console.log(message, this.getChatInstance().messages)
             this.getChatInstance().update(message.id, 'deleted', true);
         },
 
@@ -143,8 +146,8 @@ export default {
             }
         },
 
-        storeImageMessage(senderUser, image, receivedImage = true) {
-            this.getChatInstance(senderUser.id).store(image, receivedImage, true);
+        storeImageMessage(senderUser, message, receivedImage = true) {
+            return this.getChatInstance(senderUser.id).store(message, receivedImage, true);
         },
 
         storeMessage(event, inputEvent = true, senderUser = null) {

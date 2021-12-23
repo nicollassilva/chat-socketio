@@ -33,13 +33,14 @@ export default {
     },
 
     methods: {
-        deleteMessage(forAll = false) {
-            if(forAll) {
+        deleteMessage(deleteForAll = false) {
+            if(deleteForAll) {
                 window.chatEventBus.$emit('deleteMessageForAll', this.modalData);
-            } else {
-                window.chatEventBus.$emit('deleteMessageForMe', this.modalData);
+                this.close();
+                return;
             }
-            
+
+            window.chatEventBus.$emit('deleteMessageForMe', this.modalData);
             this.close();
         },
 

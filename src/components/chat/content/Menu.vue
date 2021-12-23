@@ -20,10 +20,13 @@ import Peoples from './MenuTypes/Peoples.vue'
 
 export default {
     name: "Menu",
+
     props: {
         users: Array
     },
+
     components: { Peoples, Groups },
+
     data() {
         return {
             user: window.chatEventBus.user,
@@ -36,6 +39,7 @@ export default {
             ]
         }
     },
+    
     mounted() {
         document.addEventListener('click', event => {
             if(event.target && event.target.classList.contains('button')) {
