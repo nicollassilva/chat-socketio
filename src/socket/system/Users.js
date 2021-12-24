@@ -19,7 +19,7 @@ class Users {
         return this.show(user.id);
     }
 
-    delete(value, attr = 'id') {
+    delete(value, attr = 'socketId') {
         let newObject = Objects.removeByAttribute(
             this.connected, attr, value
         );
@@ -31,12 +31,11 @@ class Users {
         return newObject.success;
     }
 
-    newData(name, socket) {
+    newData(userData, socket) {
         return {
-            id: socket.id,
-            name,
+            ...userData,
+            socketId: socket.id,
             address: socket.handshake.address,
-            disconnected: false
         };
     }
 }

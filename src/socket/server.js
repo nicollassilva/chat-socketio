@@ -3,21 +3,21 @@ const Express = require('express')();
 const Http = require('http').Server(Express)
 const IO = require('socket.io')(Http)
 
-// Functions
+// Helper Functions
 const Server = require('./functions/Server');
 
-// Data Server
+// Server Data
 const Users = require('./system/Users');
 
 IO.on('connection', socket => {
-    socket.on('userConnected', event => {
-        Server.userConnectedLog(event, socket);
+    socket.on('getSocketUserData', userData => {
+        Server.userConnectedLog(userData, socket);
 
-        let myData = Users.newData(event, socket);
-        Users.store(myData);
+        let userDataGenerated = Users.newData(userData, socket);
+        Users.store(userDataGenerated);
 
-        socket.emit('myData', myData);
-        IO.emit('connected', Users.index());
+        socket.emit('userDataGenerated', userDataGenerated);
+        IO.emit('userList', Users.index());
     })
 
     socket.on('disconnect', event => {
@@ -26,6 +26,7 @@ IO.on('connection', socket => {
         Users.delete(socket.id);
         
         IO.emit('userDisconnected', user);
+        IO.emit('userList', Users.index());
     })
 
     socket.on('sendPrivateMessage', event => socket.to(event.to).emit('receivePrivateMessage', event));

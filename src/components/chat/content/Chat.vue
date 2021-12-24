@@ -85,7 +85,10 @@ export default {
         });
 
         window.chatEventBus.$on('deleteMessageForMe', event => this.deleteMessage(event));
-        window.chatEventBus.$on('userDisconnected', event => this.userDisconnected(event));
+        
+        window.chatEventBus.$on('userDisconnected', event => {
+            console.log(`O usuário ${event.name} desconectou do chat!`)
+        });
 
         this.addImageFileLoaderListener();
     },
@@ -129,7 +132,6 @@ export default {
         },
 
         deleteMessage(message) {
-            console.log(message, this.getChatInstance().messages)
             this.getChatInstance().update(message.id, 'deleted', true);
         },
 
@@ -161,23 +163,25 @@ export default {
 
             let newMessage = this.getChatInstance(senderUser).store(message, !inputEvent);
 
-            if(inputEvent) this.privateMessageEmit(newMessage);
+            if(inputEvent) this.sendPrivateMessage(newMessage);
         },
 
-        privateMessageEmit(message) {
+        sendPrivateMessage(message) {
             window.chatEventBus.$emit('sendPrivateMessage', {
-                from: window.chatEventBus.user,
+                recipientUser: window.chatEventBus.user,
                 to: this.userConnected.id,
                 ...message
             });
         },
 
-        getChatInstance(userId = null) {
+        setChatInstance(userId = null) {
             if(!this.userConnected && !userId) return;
 
             if(!userId) userId = this.userConnected.id;
             
-            return this.chats.find(chat => chat.userConnected.id === userId);
+            let chatInstance = this.chats.find(chat => chat.userConnected.id === userId);
+
+            return chatInstance
         },
 
         initChat(userObject) {

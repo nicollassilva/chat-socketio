@@ -1,3 +1,5 @@
+const Message = require("./Message");
+
 class ChatEngine {
     constructor(user) {
         this.userConnected = user;
@@ -12,20 +14,18 @@ class ChatEngine {
         return this.messages.find(message => message.id === id);
     }
 
-    store(data, receivedMessage = false, image = false, isWarning = false) {
-        let id = Math.floor(Math.random() * 100000 + 1);
+    store(data, receivedMessage = false) {
+        let message;
 
-        this.messages.push({
-            id: receivedMessage ? data.id : id,
-            content: receivedMessage ? data.content : data,
-            time: this.getMessageTime(),
-            me: !receivedMessage,
-            deleted: false,
-            image,
-            isWarning
-        });
+        if(receivedMessage) {
+            message = Message.createFromMessage(data)
+        } else {
+            message = new Message(data)
+        }
+        
+        this.messages.push(message);
 
-        return this.show(id);
+        return message;
     }
 
     update(id, attr, value) {

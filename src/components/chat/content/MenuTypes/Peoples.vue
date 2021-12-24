@@ -1,9 +1,9 @@
 <template>
     <div class="peoples">
-        <transition-group v-if="users.length > 1" name="fade">
-        <div class="my-2" v-for="userConnected in users" :key="userConnected.id">
-            <div class="people" v-if="userConnected.id != user.id" @click="chat(userConnected)">
-                <div class="status online"></div>{{ userConnected.name }}
+        <transition-group v-if="connectedUsers.length > 1" name="fade">
+        <div class="my-2" v-for="user in connectedUsers" :key="user._id">
+            <div class="people" v-if="userConnected._id != user._id" @click="openChat(user)">
+                <div class="status online"></div>{{ user._name }}
             </div>
         </div>
         </transition-group>
@@ -13,31 +13,43 @@
 <script>
 export default {
     name: "Peoples",
-    props: { users: Array },
-    data() {
-        return {
-            user: window.chatEventBus.user
+    
+    props: {
+        connectedUsers: {
+            type: Array,
+            required: true,
+            default: () => []
         }
     },
+
+    data() {
+        return {
+            userConnected: window.user
+        }
+    },
+
     mounted() {
         document.addEventListener('click', event => {
             if(event.target && event.target.classList.contains('people')) {
-                removeActiveClass('.people.active')
+                this.removeActiveForElement('.people.active')
                 event.target.classList.toggle('active')
             }
         })
-
-        function removeActiveClass(className) {
-            let element = document.querySelector(className)
-
-            if(element) element.classList.remove('active')
-        }
     },
+
     methods: {
-        chat(user) {
+        openChat(user) {
             // user.name && user.name != this.user.name
             if(user.name) {
                 window.chatEventBus.$emit('chat', { ...user })
+            }
+        },
+
+        removeActiveForElement(className) {
+            let element = document.querySelector(className)
+
+            if(element) {
+                element.classList.remove('active')
             }
         }
     }

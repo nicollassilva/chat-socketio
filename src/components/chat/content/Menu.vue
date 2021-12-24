@@ -1,16 +1,16 @@
 <template>
-    <div class="menu-peoples-groups">
+    <div class="menu-peoples-groups" v-if="visible">
         <div class="displayWelcome d-flex">
-            Welcome, {{ user.name }}
+            Welcome, {{ user.name() }}
         </div>
         <div class="buttons">
-            <div class="button active" @click="changeMenu('users')" data-toggle="tooltip" title="Friends"><i class="fas fa-user-friends"></i></div>
+            <div class="button active" @click="changeMenu('connectedUsers')" data-toggle="tooltip" title="Friends"><i class="fas fa-user-friends"></i></div>
             <div class="button" @click="changeMenu('groups')" data-toggle="tooltip" title="Groups">
                 <i class="fas fa-users"></i>
                 <div class="createGroup" data-toggle="tooltip" title="New" @click.stop="createGroup()"><i class="fas fa-plus"></i></div>
             </div>
         </div>
-        <Peoples v-if="activeMenu == 'users'" :users="users" />
+        <Peoples v-if="menuActiveIs('connectedUsers')" :connectedUsers="connectedUsers" />
         <Groups v-else :groups="groups" />
     </div>
 </template>
@@ -22,15 +22,16 @@ export default {
     name: "Menu",
 
     props: {
-        users: Array
+        connectedUsers: Array
     },
 
     components: { Peoples, Groups },
 
     data() {
         return {
-            user: window.chatEventBus.user,
-            activeMenu: 'users',
+            user: {},
+            visible: false,
+            activeMenu: 'connectedUsers',
             groups: [
                 {
                     name: 'Grupo da Zoeira',
@@ -41,26 +42,37 @@ export default {
     },
     
     mounted() {
-        document.addEventListener('click', event => {
-            if(event.target && event.target.classList.contains('button')) {
-                removeActiveClass('.button.active')
-                event.target.classList.toggle('active')
-            }
+        window.chatEventBus.$on('userDataUpdated', () => {
+            this.user = window.user
+            this.visible = true
         })
 
-        function removeActiveClass(className) {
-            let element = document.querySelector(className)
+        document.addEventListener('click', event => {
+            if(!event.target || !event.target.classList.contains('button')) return
 
-            if(element) element.classList.remove('active')
-        }
+            this.removeActiveClass('.button.active')
+            event.target.classList.toggle('active')
+        })
     },
     methods: {
         changeMenu(menu) {
-            if(menu != this.activeMenu) this.activeMenu = menu
+            if(menu != this.activeMenu) {
+                this.activeMenu = menu
+            }
+        },
+
+        menuActiveIs(menu) {
+            return this.activeMenu === menu
         },
 
         createGroup() {
             console.log('criar grupo')
+        },
+
+        removeActiveClass(className) {
+            let element = document.querySelector(className)
+
+            if(element) element.classList.remove('active')
         }
     }
 }

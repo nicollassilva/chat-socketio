@@ -1,6 +1,6 @@
 module.exports = {
     userConnectedLog(user, socket) {
-        console.log(`${user} conectou no chat! ID: ${socket.id}`);
+        console.log(`${user.name} conectou no chat! ID: ${socket.id}`);
     },
 
     userDisconnectLog(user, socket) {
